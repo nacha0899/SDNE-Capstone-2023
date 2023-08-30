@@ -1,6 +1,10 @@
 # main menu concept for testing
 
-
+import threading
+import hashlib
+import os
+import glob
+import shutil
 # display main menu
 def mainMenu():
     print("---Main menu---")
@@ -11,10 +15,57 @@ def mainMenu():
 
 hashDict = {}
 
+#Deletes previously existing reference file
+def deleteReference():
+    print("Deleting Previous reference file")
+    referenceExists = "C:\\Users\\natha\Documents\GitHub\SDNE-Capstone-2023\ReferenceFile\\Reference.txt"
+    if os.path.exists(referenceExists):
+        os.remove(referenceExists)
+
+
+#Calculate sha256 hash for various files
+def sha256sum():
+    file = open("Reference.txt", "w+")
+    filenames = glob.glob("C:\\Users\\natha\Documents\GitHub\SDNE-Capstone-2023\Patients\*.txt")
+    for f in filenames:
+        with open(f, 'rb') as inputfile:
+            data = inputfile.read()
+            file.writelines(f + "|" + hashlib.sha256(data).hexdigest()+"\n")
+
+    file.close()
+
+    os.rename('C:\\Users\\natha\Documents\GitHub\SDNE-Capstone-2023\\Reference.txt', 'C:\\Users\\natha\Documents\GitHub\SDNE-Capstone-2023\ReferenceFile\\Reference.txt')
+# return statement in this def only returns the first file and does not cycle to file b and onwards.
+
 
 # Create reference
+
 def createReferenceFile():
-    print("\nCreate reference selected\n")
+    #Calculate hashes for each patient file and store in reference.txt file
+    # Calculate Hash from the patient files and store in reference.txt
+    # Collect all files in the patients folder
+    # path = "C:\\Users\\natha\Documents\GitHub\SDNE-Capstone-2023\Patients"
+    # files = os.listdir(path)
+    deleteReference()
+    sha256sum()
+    #file = open("testReference.txt", "w+")
+    #f.writelines(sha256sum())
+    #f.close()
+
+
+    # for f in files:
+    #     absfilepath = os.path.abspath(f)
+    #     sha256sum(f)
+    #
+    #     print(absfilepath + '|' + f)
+
+
+
+
+
+
+
+
 
 
 # Check files
