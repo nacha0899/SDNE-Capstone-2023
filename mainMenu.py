@@ -18,7 +18,7 @@ hashDict = {}
 #Deletes previously existing reference file
 def deleteReference():
     print("Deleting Previous reference file")
-    referenceExists = "C:\\Users\\natha\Documents\GitHub\SDNE-Capstone-2023\ReferenceFile\\Reference.txt"
+    referenceExists = "ReferenceFile\Reference.txt"
     if os.path.exists(referenceExists):
         os.remove(referenceExists)
 
@@ -26,7 +26,7 @@ def deleteReference():
 #Calculate sha256 hash for various files
 def sha256sum():
     file = open("Reference.txt", "w+")
-    filenames = glob.glob("C:\\Users\\natha\Documents\GitHub\SDNE-Capstone-2023\Patients\*.txt")
+    filenames = glob.glob("Patients\*.txt")
     for f in filenames:
         with open(f, 'rb') as inputfile:
             data = inputfile.read()
@@ -34,7 +34,7 @@ def sha256sum():
 
     file.close()
 
-    os.rename('C:\\Users\\natha\Documents\GitHub\SDNE-Capstone-2023\\Reference.txt', 'C:\\Users\\natha\Documents\GitHub\SDNE-Capstone-2023\ReferenceFile\\Reference.txt')
+    os.replace("Reference.txt", "ReferenceFile\Reference.txt")
 # return statement in this def only returns the first file and does not cycle to file b and onwards.
 
 
