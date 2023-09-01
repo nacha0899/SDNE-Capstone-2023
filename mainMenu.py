@@ -65,12 +65,24 @@ def checkFile():
     # B-0: Load file/hash pairs from reference.text and store then in a dictionary
     # key = file path
     # value = corresponding file hash
+    #line=1
+    referenceExists = "ReferenceFile\Reference.txt"
 
-    with open('C:\\Users\\natha\Documents\GitHub\SDNE-Capstone-2023\ReferenceFile\\Reference.txt') as ref:
+    if not os.path.exists(referenceExists):
+        # One of the Reference.txt has been deleted
+        print(referenceExists + "Has Been Deleted!")
+        return
+
+    with open('ReferenceFile\Reference.txt') as ref:
         pathsAndHashes = ref.readlines()
 
     for entry in pathsAndHashes:
-        hashDict.update({entry.split("|")[0]: entry.split("|")[1]})
+        # line+=1
+        # if line % 2 == 0:
+        hashDict.update({entry.split("|")[0]: entry.split("|")[1].strip()})
+    print(hashDict.keys())
+    print(hashDict.values())
+
 
         # B-1: Continuously monitor file integrity
     # 25:49, 27:56
@@ -78,39 +90,39 @@ def checkFile():
     # if the key doesn't exist, we know that it's a new file
     # if the key does exists and the hash is different, we know that the file has been changed
     # for keys,values in hashDict.items():
-    #     print(keys)
-    #     print(values)
 
     while True:
         print("Beginning Check...")
-        time.sleep(3)
+        time.sleep(5)
 
         #Calculating each file Hash in patients folder to compre directly to hashDict key/value pairs.
-        filenamescompare = glob.glob("C:\\Users\\natha\Documents\GitHub\SDNE-Capstone-2023\Patients\*.txt")
+        filenamescompare = glob.glob("Patients\*.txt")
         for f in filenamescompare:
             comparinghash = hashlib.sha256(open(f, 'rb').read()).hexdigest()
-            print(comparinghash)
 
-            if hashDict[f] == 0:
-                # a new file has been created!
-                print(f + "has been created!")
+            if not hashDict.__contains__(f):
+                # a new file has been created that is not in the reference file!
+                print(f + " has been created!")
             else:
                 if hashDict[f] == comparinghash:
                     print()
                 else:
                     # file has been compromised, notify the user!
-                    print(f + "has changed!")
+                    print(f + " has changed!")
 
-            # Line 98 is an issue, something to do with Key,value comparing with the comparing hash and f. Must look into it to complete B
+
+            # Line 98-99 is an issue, something to do with Key,value comparing with the comparing hash and f. Must look into it to complete B
+            # Error was caused due to Dictionary having '\n' attached to the value, using strip() on line 75 resolves issue
 
         for k in hashDict.keys():
-            referenceExists = "C:\\Users\\natha\Documents\GitHub\SDNE-Capstone-2023\ReferenceFile\\Reference.txt"
+            referenceExists = "ReferenceFile\Reference.txt"
 
             if not os.path.exists(referenceExists):
                 #One of the Reference.txt has been deleted
-                print(k + "Has Been Deleted!")
+                print(k + " Has Been Deleted!")
 
-        print("Concluded Check...")
+        print("Concluded Check...\n\n")
+        return
         # def printIt():
         #    threading.Timer(1.0, printit).start()
         #    print("Checking if files match...")
