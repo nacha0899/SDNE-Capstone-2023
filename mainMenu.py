@@ -18,18 +18,18 @@ hashDict = {}
 #Deletes previously existing reference file
 def deleteReference():
     print("Deleting Previous reference file")
-    referenceExists = "ReferenceFile\Reference.txt"
-    if os.path.exists(referenceExists):
-        os.remove(referenceExists)
+    referencePath = "ReferenceFile\Reference.txt"
+    if os.path.exists(referencePath):
+        os.remove(referencePath)
 
 
 #Calculate sha256 hash for various files
 def sha256sum():
     file = open("Reference.txt", "w+")
-    filenames = glob.glob("Patients\*.txt")
-    for f in filenames:
-        with open(f, 'rb') as inputfile:
-            data = inputfile.read()
+    fileNames = glob.glob("Patients\*.txt")
+    for f in fileNames:
+        with open(f, 'rb') as inputFile:
+            data = inputFile.read()
             file.writelines(f + "|" + hashlib.sha256(data).hexdigest()+"\n")
 
     file.close()
@@ -66,11 +66,11 @@ def checkFile():
     # key = file path
     # value = corresponding file hash
     #line=1
-    referenceExists = "ReferenceFile\Reference.txt"
+    referencePath = "ReferenceFile\Reference.txt"
 
-    if not os.path.exists(referenceExists):
+    if not os.path.exists(referencePath):
         # One of the Reference.txt has been deleted
-        print(referenceExists + "Has Been Deleted!")
+        print(referencePath + "Has Been Deleted!")
         return
 
     with open('ReferenceFile\Reference.txt') as ref:
@@ -96,15 +96,15 @@ def checkFile():
         time.sleep(5)
 
         #Calculating each file Hash in patients folder to compre directly to hashDict key/value pairs.
-        filenamescompare = glob.glob("Patients\*.txt")
-        for f in filenamescompare:
-            comparinghash = hashlib.sha256(open(f, 'rb').read()).hexdigest()
+        fileNamesToCompare = glob.glob("Patients\*.txt")
+        for f in fileNamesToCompare:
+            comparingHash = hashlib.sha256(open(f, 'rb').read()).hexdigest()
 
             if not hashDict.__contains__(f):
                 # a new file has been created that is not in the reference file!
                 print(f + " has been created!")
             else:
-                if hashDict[f] == comparinghash:
+                if hashDict[f] == comparingHash:
                     print()
                 else:
                     # file has been compromised, notify the user!
@@ -114,12 +114,21 @@ def checkFile():
             # Line 98-99 is an issue, something to do with Key,value comparing with the comparing hash and f. Must look into it to complete B
             # Error was caused due to Dictionary having '\n' attached to the value, using strip() on line 75 resolves issue
 
-        for k in hashDict.keys():
-            referenceExists = "ReferenceFile\Reference.txt"
+        #check if a file has been deleted
+        for key in hashDict.keys():
+            if key not in fileNamesToCompare:
+                # file in reference.txt has been deleted, notify the user!
+                print(key + " has been deleted!")
+                return
 
-            if not os.path.exists(referenceExists):
-                #One of the Reference.txt has been deleted
-                print(k + " Has Been Deleted!")
+        #I have kept Line 125-131 but commented them they've been tested
+        # It does nothing yet. it is advised to be removed.
+        #for k in hashDict.keys():
+        #    referenceExists = "ReferenceFile\Reference.txt"
+
+        #    if not os.path.exists(referenceExists):
+        #        #One of the Reference.txt has been deleted
+        #        print(k + " Has Been Deleted!")
 
         print("Concluded Check...\n\n")
         return
