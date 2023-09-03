@@ -5,53 +5,77 @@ import hashlib
 import os
 import glob
 import time
+
+
 # display main menu
 def mainMenu():
     print("---Main menu---")
     print("[1] Create new reference text file")
     print("[2] Check files to reference hash")
+    print("[3] Compare File to previous Versions")
     print("[0] Exit program")
 
 
 hashDict = {}
 
-#Deletes previously existing reference file
+
+# Deletes previously existing reference file
 def deleteReference():
     print("Deleting Previous reference file")
     referencePath = "ReferenceFile\Reference.txt"
+    dateReferencePath = "ReferenceFile\DateReference.txt"
     if os.path.exists(referencePath):
         os.remove(referencePath)
 
+    if os.path.exists(dateReferencePath):
+        os.remove(dateReferencePath)
 
-#Calculate sha256 hash for various files
+
+# Calculate sha256 hash for various files
 def sha256sum():
     file = open("Reference.txt", "w+")
     fileNames = glob.glob("Patients\*.txt")
     for f in fileNames:
         with open(f, 'rb') as inputFile:
             data = inputFile.read()
-            file.writelines(f + "|" + hashlib.sha256(data).hexdigest()+"\n")
+            file.writelines(f + "|" + hashlib.sha256(data).hexdigest() + "\n")
 
     file.close()
 
     os.replace("Reference.txt", "ReferenceFile\Reference.txt")
+
+def dateFileSum():
+    # Create a new file instead of the hash include the last date of file modification for each patient
+
+    datefile = open("DateReference.txt", "w+")
+    dateFileNames = glob.glob("Patients\*.txt")
+
+    for d in dateFileNames:
+        with open(d, 'rb') as inputFile:
+            data = inputFile.read()
+            datefile.writelines(d + "|" + str(time.ctime(os.path.getmtime(d))) + "\n")
+
+    datefile.close()
+    os.replace("DateReference.txt", "ReferenceFile\DateReference.txt")
+
+
 # return statement in this def only returns the first file and does not cycle to file b and onwards.
 
 
 # Create reference
 
 def createReferenceFile():
-    #Calculate hashes for each patient file and store in reference.txt file
+    # Calculate hashes for each patient file and store in reference.txt file
     # Calculate Hash from the patient files and store in reference.txt
     # Collect all files in the patients folder
     # path = "C:\\Users\\natha\Documents\GitHub\SDNE-Capstone-2023\Patients"
     # files = os.listdir(path)
     deleteReference()
     sha256sum()
-    #file = open("testReference.txt", "w+")
-    #f.writelines(sha256sum())
-    #f.close()
-
+    dateFileSum()
+    # file = open("testReference.txt", "w+")
+    # f.writelines(sha256sum())
+    # f.close()
 
     # for f in files:
     #     absfilepath = os.path.abspath(f)
@@ -65,7 +89,7 @@ def checkFile():
     # B-0: Load file/hash pairs from reference.text and store then in a dictionary
     # key = file path
     # value = corresponding file hash
-    #line=1
+    # line=1
     referencePath = "ReferenceFile\Reference.txt"
 
     if not os.path.exists(referencePath):
@@ -83,8 +107,7 @@ def checkFile():
     print(hashDict.keys())
     print(hashDict.values())
 
-
-        # B-1: Continuously monitor file integrity
+    # B-1: Continuously monitor file integrity
     # 25:49, 27:56
     # check inside dictionary if the key exists..
     # if the key doesn't exist, we know that it's a new file
@@ -95,7 +118,7 @@ def checkFile():
         print("Beginning Check...")
         time.sleep(5)
 
-        #Calculating each file Hash in patients folder to compre directly to hashDict key/value pairs.
+        # Calculating each file Hash in patients folder to compre directly to hashDict key/value pairs.
         fileNamesToCompare = glob.glob("Patients\*.txt")
         for f in fileNamesToCompare:
             comparingHash = hashlib.sha256(open(f, 'rb').read()).hexdigest()
@@ -110,20 +133,19 @@ def checkFile():
                     # file has been compromised, notify the user!
                     print(f + " has changed!")
 
-
             # Line 98-99 is an issue, something to do with Key,value comparing with the comparing hash and f. Must look into it to complete B
             # Error was caused due to Dictionary having '\n' attached to the value, using strip() on line 75 resolves issue
 
-        #check if a file has been deleted
+        # check if a file has been deleted
         for key in hashDict.keys():
             if key not in fileNamesToCompare:
                 # file in reference.txt has been deleted, notify the user!
                 print(key + " has been deleted!")
                 return
 
-        #I have kept Line 125-131 but commented them they've been tested
+        # I have kept Line 125-131 but commented them they've been tested
         # It does nothing yet. it is advised to be removed.
-        #for k in hashDict.keys():
+        # for k in hashDict.keys():
         #    referenceExists = "ReferenceFile\Reference.txt"
 
         #    if not os.path.exists(referenceExists):
@@ -160,7 +182,33 @@ def checkFile():
         #             print(hash.path + "has been deleted!")
 
 
-            # START OF EXECUTION
+# Check for specific file name, contents and datestamp of the file.
+# Will have to do various things for version control
+# -Ensure the file has the same name as the one in the repo
+# -Ensure the file has the same
+def checkSpecificFile():
+    print(
+        "Please enter which filename you wish to compare previous versions to. Do not include file extension\nFiles Available:")
+    fileNames = glob.glob("Patients\*.txt")
+    for f in fileNames:
+        print(f + "\n")
+
+    fileSelection = "Patients\\" + (input("Select the Patient Name")) + ".txt"
+
+    for f in fileNames:
+        if f == fileSelection:
+            print(f + " selected")
+            # Code Check for date.
+
+            return
+        else:
+            print(fileSelection + "Not found")
+            return
+    return
+
+    # START OF EXECUTION
+
+
 mainMenu()
 userSelection = int(input("\nWhat would you like to do? "))
 
@@ -172,6 +220,10 @@ while userSelection != 0:
     elif userSelection == 2:
         # create new reference here
         checkFile()
+
+    elif userSelection == 3:
+        # Investigate Version
+        checkSpecificFile()
 
     else:
         # create new reference here
