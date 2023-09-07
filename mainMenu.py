@@ -17,6 +17,7 @@ def mainMenu():
 
 
 hashDict = {}
+dateDict = {}
 
 
 # Deletes previously existing reference file
@@ -184,22 +185,36 @@ def checkFile():
 
 # Check for specific file name, contents and datestamp of the file.
 # Will have to do various things for version control
-# -Ensure the file has the same name as the one in the repo
-# -Ensure the file has the same
+# -Ensure the file has the same name as the one in the repo (done)
+# -Ensure the file has the same date, if not, announce a new version has been created
 def checkSpecificFile():
-    print(
-        "Please enter which filename you wish to compare previous versions to. Do not include file extension\nFiles Available:")
+    print("Please enter which filename you wish to compare previous versions to. Do not include file extension\nFiles Available:")
     fileNames = glob.glob("Patients\*.txt")
+
+    with open('ReferenceFile\DateReference.txt') as ref:
+        pathsAndDates = ref.readlines()
+
+    for entry in pathsAndDates:
+        dateDict.update({entry.split("|")[0]: entry.split("|")[1].strip()})
+    print(dateDict.keys())
+    print(dateDict.values())
+
     for f in fileNames:
         print(f + "\n")
 
     fileSelection = "Patients\\" + (input("Select the Patient Name")) + ".txt"
 
     for f in fileNames:
+
+        comparingDate = (time.ctime(os.path.getmtime(f)))
+
         if f == fileSelection:
             print(f + " selected")
             # Code Check for date.
-
+            if dateDict[f].__contains__(comparingDate):
+                print("MATCH IN DATE")
+            else:
+                print("File " + f + "is a new version, created on " + comparingDate)
             return
         else:
             print(fileSelection + "Not found")
