@@ -10,7 +10,7 @@ import time
 # display main menu
 def mainMenu():
     print("---Main menu---")
-    print("[1] Create new reference text file")
+    print("[1] Create new reference text file")#TODO:update wording regarding creation/updating of reference files.
     print("[2] Check files to reference hash")
     print("[3] Compare File to previous Versions")
     print("[0] Exit program")
@@ -22,7 +22,7 @@ dateDict = {}
 
 # Deletes previously existing reference file
 def deleteReference():
-    print("Deleting Previous reference file")
+    print("Updating Previous reference file")
     referencePath = "ReferenceFile\Reference.txt"
     dateReferencePath = "ReferenceFile\DateReference.txt"
     if os.path.exists(referencePath):
@@ -95,7 +95,7 @@ def checkFile():
 
     if not os.path.exists(referencePath):
         # One of the Reference.txt has been deleted
-        print(referencePath + "Has Been Deleted!")
+        print(referencePath + "Has been removed!")
         return
 
     with open('ReferenceFile\Reference.txt') as ref:
@@ -105,8 +105,8 @@ def checkFile():
         # line+=1
         # if line % 2 == 0:
         hashDict.update({entry.split("|")[0]: entry.split("|")[1].strip()})
-    print(hashDict.keys())
-    print(hashDict.values())
+    # print(hashDict.keys())
+    # print(hashDict.values())
 
     # B-1: Continuously monitor file integrity
     # 25:49, 27:56
@@ -188,6 +188,7 @@ def checkFile():
 # -Ensure the file has the same name as the one in the repo (done)
 # -Ensure the file has the same date, if not, announce a new version has been created
 def checkSpecificFile():
+
     print("Please enter which filename you wish to compare previous versions to. Do not include file extension\nFiles Available:")
     fileNames = glob.glob("Patients\*.txt")
 
@@ -196,8 +197,8 @@ def checkSpecificFile():
 
     for entry in pathsAndDates:
         dateDict.update({entry.split("|")[0]: entry.split("|")[1].strip()})
-    print(dateDict.keys())
-    print(dateDict.values())
+    # print(dateDict.keys())
+    # print(dateDict.values())
 
     for f in fileNames:
         print(f + "\n")
@@ -211,15 +212,18 @@ def checkSpecificFile():
         if f == fileSelection:
             print(f + " selected")
             # Code Check for date.
+
             if dateDict[f].__contains__(comparingDate):
                 print("MATCH IN DATE")
             else:
-                print("File " + f + "is a new version, created on " + comparingDate)
-            return
+                print("File " + f + " is a new version, last modified on " + comparingDate)
+                return
         else:
             print(fileSelection + "Not found")
             return
-    return
+        return
+
+
 
     # START OF EXECUTION
 
