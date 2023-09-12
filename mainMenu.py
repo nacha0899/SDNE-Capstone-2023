@@ -211,17 +211,19 @@ def checkSpecificFile():
 
         if f == fileSelection:
             print(f + " selected")
-            # Code Check for date.
-
+            # Code Check for date
             if dateDict[f].__contains__(comparingDate):
                 print("MATCH IN DATE")
+                return
             else:
                 print("File " + f + " is a new version, last modified on " + comparingDate)
                 return
-        else:
-            print(fileSelection + "Not found")
-            return
-        return
+        # if not fileSelection.__contains__(f):
+        #     print("file does not exist")
+        #     break
+    print("file does not exist")
+    checkSpecificFile()
+
 
 
 
