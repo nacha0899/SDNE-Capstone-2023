@@ -233,9 +233,9 @@ def checkSpecificFile():
 
 
 
-#     # START OF EXECUTION
+#     #START OF EXECUTION
 #
-# # Launch http Server to monitor files on another computer
+# #Launch http Server to monitor files on another computer
 # PORT = 8000
 #
 # Handler = http.server.SimpleHTTPRequestHandler
