@@ -5,6 +5,10 @@ import hashlib
 import os
 import glob
 import time
+import http.server
+import socketserver
+
+
 
 
 # display main menu
@@ -227,11 +231,26 @@ def checkSpecificFile():
 
 
 
-    # START OF EXECUTION
+
+
+#     # START OF EXECUTION
+#
+# # Launch http Server to monitor files on another computer
+# PORT = 8000
+#
+# Handler = http.server.SimpleHTTPRequestHandler
+#
+# with socketserver.TCPServer(("192.168.2.180", PORT), Handler) as httpd:
+#     print("serving at port", PORT)
+#     httpd.serve_forever()
 
 
 mainMenu()
+
+
 userSelection = int(input("\nWhat would you like to do? "))
+
+
 
 while userSelection != 0:
     if userSelection == 1:
