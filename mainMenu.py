@@ -7,6 +7,8 @@ import glob
 import time
 import http.server
 import socketserver
+from cryptography.fernet import Fernet
+
 
 
 
@@ -23,6 +25,11 @@ def mainMenu():
 hashDict = {}
 dateDict = {}
 
+
+key = Fernet.generate_key()
+with open('mykey.key', 'wb') as mykey:
+    mykey.write(key)
+fk = Fernet(key)
 
 # Deletes previously existing reference file
 def deleteReference():
@@ -49,6 +56,14 @@ def sha256sum():
 
     os.replace("Reference.txt", "ReferenceFile\Reference.txt")
 
+    with open('ReferenceFile\Reference.txt', 'rb') as originalFile:
+        original = originalFile.read()
+    encrypted = fk.encrypt(original)
+
+    with open('enc_Reference.txt', 'wb') as encryptedFile:
+        encryptedFile.write(encrypted)
+
+    os.replace("enc_Reference.txt", "ReferenceFile\enc_Reference.txt")
 def dateFileSum():
     # Create a new file instead of the hash include the last date of file modification for each patient
 
@@ -62,6 +77,18 @@ def dateFileSum():
 
     datefile.close()
     os.replace("DateReference.txt", "ReferenceFile\DateReference.txt")
+
+
+    with open('ReferenceFile\DateReference.txt', 'rb') as originalFile:
+        original = originalFile.read()
+    encrypted = fk.encrypt(original)
+
+    with open('enc_DateReference.txt', 'wb') as encryptedFile:
+        encryptedFile.write(encrypted)
+
+    os.replace("enc_DateReference.txt", "ReferenceFile\enc_DateReference.txt")
+
+
 
 
 # return statement in this def only returns the first file and does not cycle to file b and onwards.
@@ -91,26 +118,35 @@ def createReferenceFile():
 
 # Check files
 def checkFile():
+
+
     # B-0: Load file/hash pairs from reference.text and store then in a dictionary
     # key = file path
     # value = corresponding file hash
     # line=1
-    referencePath = "ReferenceFile\Reference.txt"
+    referencePath = "ReferenceFile\enc_Reference.txt"
 
     if not os.path.exists(referencePath):
         # One of the Reference.txt has been deleted
         print(referencePath + "Has been removed!")
         return
 
-    with open('ReferenceFile\Reference.txt') as ref:
-        pathsAndHashes = ref.readlines()
+    with open('ReferenceFile\enc_Reference.txt', 'rb') as enc_ref:
+        encrypted = enc_ref.read()
+    decrypted = fk.decrypt(encrypted)
 
+    with open('dec_Reference.txt', 'wb') as dec_ref:
+        dec_ref.write(decrypted)
+
+    with open('dec_Reference.txt', 'rb') as dec:
+        pathsAndHashes = str(dec.readlines())
+        print(pathsAndHashes)
     for entry in pathsAndHashes:
         # line+=1
         # if line % 2 == 0:
-        hashDict.update({entry.split("|")[0]: entry.split("|")[1].strip()})
-    # print(hashDict.keys())
-    # print(hashDict.values())
+        str(hashDict.update({entry.split("|")[0]: entry.split("|")[0].strip("\r\n")}))
+        print(hashDict.keys())
+        print(hashDict.values())
 
     # B-1: Continuously monitor file integrity
     # 25:49, 27:56
@@ -233,14 +269,16 @@ def checkSpecificFile():
 
 
 
-#     #START OF EXECUTION
-#
+# #     #START OF EXECUTION
+# #
+#IP FOR SHERIDAN: 10.16.44.141
+#IP FOR HOME: 192.168.2.180
 # #Launch http Server to monitor files on another computer
 # PORT = 8000
 #
 # Handler = http.server.SimpleHTTPRequestHandler
 #
-# with socketserver.TCPServer(("192.168.2.180", PORT), Handler) as httpd:
+# with socketserver.TCPServer(("10.16.44.141", PORT), Handler) as httpd:
 #     print("serving at port", PORT)
 #     httpd.serve_forever()
 
