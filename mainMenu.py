@@ -8,15 +8,39 @@ import time
 import http.server
 import socketserver
 from cryptography.fernet import Fernet
+from flask import Flask, render_template
+from flask_wtf import FlaskForm
+from wtforms import FileField, SubmitField
+from werkzeug.utils import secure_filename
+from wtforms.validators import InputRequired
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'ssk' #protects csrf attacks
+app.config['UPLOAD_FOLDER'] = 'NewPatients'
+class UploadFileForm(FlaskForm):
+    file = FileField("File", validators=[InputRequired()])
+    submit = SubmitField("Upload File")
 
 
+@app.route('/', methods=['GET', "POST"])
+@app.route('/home', methods=['GET', "POST"])
+def home():
+    form = UploadFileForm()
+    if form.validate_on_submit():
+        file = form.file.data
+        file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'], secure_filename(file.filename))) #may need to change abspath to relative path
+        return "File has been uploaded."
+    return render_template("index.html", form=form)
 
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 
 # display main menu
 def mainMenu():
     print("---Main menu---")
-    print("[1] Create new reference text file")#TODO:update wording regarding creation/updating of reference files.
+    print("[1] Create new reference text file")  # TODO:update wording regarding creation/updating of reference files.
     print("[2] Check files to reference hash")
     print("[3] Compare File to previous Versions")
     print("[0] Exit program")
@@ -64,6 +88,8 @@ def sha256sum():
         encryptedFile.write(encrypted)
 
     os.replace("enc_Reference.txt", "ReferenceFile\enc_Reference.txt")
+
+
 def dateFileSum():
     # Create a new file instead of the hash include the last date of file modification for each patient
 
@@ -78,7 +104,6 @@ def dateFileSum():
     datefile.close()
     os.replace("DateReference.txt", "ReferenceFile\DateReference.txt")
 
-
     with open('ReferenceFile\DateReference.txt', 'rb') as originalFile:
         original = originalFile.read()
     encrypted = fk.encrypt(original)
@@ -87,8 +112,6 @@ def dateFileSum():
         encryptedFile.write(encrypted)
 
     os.replace("enc_DateReference.txt", "ReferenceFile\enc_DateReference.txt")
-
-
 
 
 # return statement in this def only returns the first file and does not cycle to file b and onwards.
@@ -118,9 +141,7 @@ def createReferenceFile():
 
 # Check files
 def checkFile():
-
-# ADD A SECTION THAT CREATES A NEW ENCRYPTED VERSION OF THE CURRENT REFERENCE FILES.
-
+    # ADD A SECTION THAT CREATES A NEW ENCRYPTED VERSION OF THE CURRENT REFERENCE FILES.
 
     # B-0: Load file/hash pairs from reference.text and store then in a dictionary
     # key = file path
@@ -198,8 +219,6 @@ def checkFile():
         print("Deleted Decrypted Files")
         os.remove("ReferenceFile\dec_Reference.txt")
 
-
-
         return
         # def printIt():
         #    threading.Timer(1.0, printit).start()
@@ -234,8 +253,8 @@ def checkFile():
 # -Ensure the file has the same name as the one in the repo (done)
 # -Ensure the file has the same date, if not, announce a new version has been created
 def checkSpecificFile():
-
-    print("Please enter which filename you wish to compare previous versions to. Do not include file extension\nFiles Available:")
+    print(
+        "Please enter which filename you wish to compare previous versions to. Do not include file extension\nFiles Available:")
     fileNames = glob.glob("Patients\*.txt")
 
     with open('ReferenceFile\DateReference.txt') as ref:
@@ -271,14 +290,10 @@ def checkSpecificFile():
     checkSpecificFile()
 
 
-
-
-
-
 # #     #START OF EXECUTION
 # #
-#IP FOR SHERIDAN: 10.16.44.141
-#IP FOR HOME: 192.168.2.180
+# IP FOR SHERIDAN: 10.16.44.141
+# IP FOR HOME: 192.168.2.180
 # #Launch http Server to monitor files on another computer
 # PORT = 8000
 #
@@ -291,10 +306,7 @@ def checkSpecificFile():
 
 mainMenu()
 
-
 userSelection = int(input("\nWhat would you like to do? "))
-
-
 
 while userSelection != 0:
     if userSelection == 1:
