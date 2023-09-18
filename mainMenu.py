@@ -1,5 +1,5 @@
 # main menu concept for testing
-
+import codecs
 import threading
 import hashlib
 import os
@@ -25,11 +25,11 @@ def mainMenu():
 hashDict = {}
 dateDict = {}
 
-
 key = Fernet.generate_key()
 with open('mykey.key', 'wb') as mykey:
     mykey.write(key)
 fk = Fernet(key)
+
 
 # Deletes previously existing reference file
 def deleteReference():
@@ -119,6 +119,8 @@ def createReferenceFile():
 # Check files
 def checkFile():
 
+# ADD A SECTION THAT CREATES A NEW ENCRYPTED VERSION OF THE CURRENT REFERENCE FILES.
+
 
     # B-0: Load file/hash pairs from reference.text and store then in a dictionary
     # key = file path
@@ -138,16 +140,15 @@ def checkFile():
     with open('dec_Reference.txt', 'wb') as dec_ref:
         dec_ref.write(decrypted)
 
-    with open('dec_Reference.txt', 'rb') as dec:
-        pathsAndHashes = str(dec.readlines())
+    with open('dec_Reference.txt', 'r') as dec:
+        pathsAndHashes = dec.readlines()
         print(pathsAndHashes)
     for entry in pathsAndHashes:
         # line+=1
         # if line % 2 == 0:
-        str(hashDict.update({entry.split("|")[0]: entry.split("|")[0].strip("\r\n")}))
-        print(hashDict.keys())
-        print(hashDict.values())
+        hashDict.update({entry.split("|")[0]: entry.split("|")[1].strip()})
 
+    os.replace("dec_Reference.txt", "ReferenceFile\dec_Reference.txt")
     # B-1: Continuously monitor file integrity
     # 25:49, 27:56
     # check inside dictionary if the key exists..
@@ -194,6 +195,11 @@ def checkFile():
         #        print(k + " Has Been Deleted!")
 
         print("Concluded Check...\n\n")
+        print("Deleted Decrypted Files")
+        os.remove("ReferenceFile\dec_Reference.txt")
+
+
+
         return
         # def printIt():
         #    threading.Timer(1.0, printit).start()

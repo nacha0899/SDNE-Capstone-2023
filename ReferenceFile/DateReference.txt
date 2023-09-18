@@ -1,4 +1,0 @@
-Patients\a.txt|Fri Sep 15 09:31:02 2023
-Patients\b.txt|Fri Sep 15 09:31:02 2023
-Patients\c.txt|Thu Sep  7 09:13:59 2023
-Patients\d.txt|Thu Sep  7 09:13:59 2023
