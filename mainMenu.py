@@ -14,9 +14,20 @@ from wtforms import FileField, SubmitField
 from werkzeug.utils import secure_filename
 from wtforms.validators import InputRequired
 
+# Checker Boolean values for OPTION 2:
+E0 = False  # Check if Reference file got deleted before-hand
+E1 = False  # Check for if new patient file got added and does not line up with reference file
+E2 = False  # Check if Hash does not match file, file has been compromised
+E3 = False  # Check if Reference file was deleted after main checks were completed
+E4 = False  # Check if Date file does not match anything in date_reference file
+E5 = False  # Check if file does not exist, last check.
+
+
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'ssk' #protects csrf attacks
+app.config['SECRET_KEY'] = 'ssk'  # protects csrf attacks
 app.config['UPLOAD_FOLDER'] = 'NewPatients'
+
+
 class UploadFileForm(FlaskForm):
     file = FileField("File", validators=[InputRequired()])
     submit = SubmitField("Upload File")
@@ -28,9 +39,31 @@ def home():
     form = UploadFileForm()
     if form.validate_on_submit():
         file = form.file.data
-        file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'], secure_filename(file.filename))) #may need to change abspath to relative path
+        file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'],
+                               secure_filename(file.filename)))  # may need to change abspath to relative path
         return "File has been uploaded."
     return render_template("index.html", form=form)
+
+
+@app.route('/alert/', methods=['GET', "POST"])
+def alert():
+    checkFile() #OPTION 2 WILL NOT WORK AS LONG AS checkfile() WILL USE Asynchornous method call to fix.
+    if E1 == True:
+        message = "Alert E1 triggered"
+        return render_template('alert.html', message=message)
+    if E2 == True:
+        message = "Alert E2 triggered"
+        return render_template('alert.html', message=message)
+    if E3 == True:
+        message = "Alert E3 triggered"
+        return render_template('alert.html', message=message)
+    if E4 == True:
+        message = "Alert E4 triggered"
+        return render_template('alert.html', message=message)
+    if E5 == True:
+        message = "Alert E5 triggered"
+        return render_template('alert.html', message=message)
+    return render_template('alert.html')
 
 
 if __name__ == '__main__':
@@ -48,6 +81,7 @@ def mainMenu():
 
 hashDict = {}
 dateDict = {}
+
 
 key = Fernet.generate_key()
 with open('mykey.key', 'wb') as mykey:
@@ -152,6 +186,7 @@ def checkFile():
     if not os.path.exists(referencePath):
         # One of the Reference.txt has been deleted
         print(referencePath + "Has been removed!")
+        E0 = True
         return
 
     with open('ReferenceFile\enc_Reference.txt', 'rb') as enc_ref:
@@ -189,12 +224,14 @@ def checkFile():
             if not hashDict.__contains__(f):
                 # a new file has been created that is not in the reference file!
                 print(f + " has been created!")
+                E1 = True
             else:
                 if hashDict[f] == comparingHash:
                     print()
                 else:
                     # file has been compromised, notify the user!
                     print(f + " has changed!")
+                    E2 = True
 
             # Line 98-99 is an issue, something to do with Key,value comparing with the comparing hash and f. Must look into it to complete B
             # Error was caused due to Dictionary having '\n' attached to the value, using strip() on line 75 resolves issue
@@ -204,6 +241,7 @@ def checkFile():
             if key not in fileNamesToCompare:
                 # file in reference.txt has been deleted, notify the user!
                 print(key + " has been deleted!")
+                E3 = True
                 return
 
         # I have kept Line 125-131 but commented them they've been tested
@@ -282,11 +320,13 @@ def checkSpecificFile():
                 return
             else:
                 print("File " + f + " is a new version, last modified on " + comparingDate)
+                E4 = True
                 return
         # if not fileSelection.__contains__(f):
         #     print("file does not exist")
         #     break
     print("file does not exist")
+    E5 = True
     checkSpecificFile()
 
 
