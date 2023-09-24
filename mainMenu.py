@@ -7,12 +7,15 @@ import glob
 import time
 import http.server
 import socketserver
+import asyncio
 from cryptography.fernet import Fernet
 from flask import Flask, render_template
 from flask_wtf import FlaskForm
 from wtforms import FileField, SubmitField
 from werkzeug.utils import secure_filename
 from wtforms.validators import InputRequired
+from multiprocessing import Pool
+
 
 # Checker Boolean values for OPTION 2:
 E0 = False  # Check if Reference file got deleted before-hand
@@ -46,8 +49,9 @@ def home():
 
 
 @app.route('/alert/', methods=['GET', "POST"])
-def alert():
-    checkFile() #OPTION 2 WILL NOT WORK AS LONG AS checkfile() WILL USE Asynchornous method call to fix.
+async def alert():
+
+    await checkFile() #OPTION 2 WILL NOT WORK AS LONG AS checkfile() WILL USE Asynchornous method call to fix.
     if E1 == True:
         message = "Alert E1 triggered"
         return render_template('alert.html', message=message)
@@ -174,7 +178,7 @@ def createReferenceFile():
 
 
 # Check files
-def checkFile():
+async def checkFile():
     # ADD A SECTION THAT CREATES A NEW ENCRYPTED VERSION OF THE CURRENT REFERENCE FILES.
 
     # B-0: Load file/hash pairs from reference.text and store then in a dictionary
@@ -346,6 +350,7 @@ def checkSpecificFile():
 
 mainMenu()
 
+
 userSelection = int(input("\nWhat would you like to do? "))
 
 while userSelection != 0:
@@ -369,3 +374,5 @@ while userSelection != 0:
     userSelection = int(input("\nWhat would you like to do? "))
 
 print("\nTerminating session...goodbye!")
+
+asyncio.run(alert())
