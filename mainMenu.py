@@ -18,7 +18,7 @@ from multiprocessing import Pool
 
 
 # Checker Boolean values for OPTION 2:
-E0 = False  # Check if Reference file got deleted before-hand
+E6 = False # Check if Reference file got deleted beforehand
 E1 = False  # Check for if new patient file got added and does not line up with reference file
 E2 = False  # Check if Hash does not match file, file has been compromised
 E3 = False  # Check if Reference file was deleted after main checks were completed
@@ -49,9 +49,12 @@ def home():
 
 
 @app.route('/alert/', methods=['GET', "POST"])
-async def alert():
+def alert():
 
-    await checkFile() #OPTION 2 WILL NOT WORK AS LONG AS checkfile() WILL USE Asynchornous method call to fix.
+#    checkFile()  # OPTION 2 WILL NOT WORK AS LONG AS checkfile() WILL USE Asynchornous method call to fix.
+    if E6 == True:
+        message = "Alert E0 triggered"
+        return render_template('alert.html', message=message)
     if E1 == True:
         message = "Alert E1 triggered"
         return render_template('alert.html', message=message)
@@ -67,6 +70,13 @@ async def alert():
     if E5 == True:
         message = "Alert E5 triggered"
         return render_template('alert.html', message=message)
+
+    print(E6)
+    print(E1)
+    print(E2)
+    print(E3)
+    print(E4)
+    print(E5)
     return render_template('alert.html')
 
 
@@ -178,7 +188,14 @@ def createReferenceFile():
 
 
 # Check files
-async def checkFile():
+def checkFile():
+
+    global E6
+    global E1
+    global E2
+    global E3
+    global E4
+    global E5
     # ADD A SECTION THAT CREATES A NEW ENCRYPTED VERSION OF THE CURRENT REFERENCE FILES.
 
     # B-0: Load file/hash pairs from reference.text and store then in a dictionary
@@ -190,7 +207,7 @@ async def checkFile():
     if not os.path.exists(referencePath):
         # One of the Reference.txt has been deleted
         print(referencePath + "Has been removed!")
-        E0 = True
+        E6 = True
         return
 
     with open('ReferenceFile\enc_Reference.txt', 'rb') as enc_ref:
@@ -375,4 +392,4 @@ while userSelection != 0:
 
 print("\nTerminating session...goodbye!")
 
-asyncio.run(alert())
+alert()
