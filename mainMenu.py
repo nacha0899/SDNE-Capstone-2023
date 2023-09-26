@@ -49,9 +49,9 @@ def home():
 
 
 @app.route('/alert/', methods=['GET', "POST"])
-async def alert():
+def alert():
 
-    await checkFile() #OPTION 2 WILL NOT WORK AS LONG AS checkfile() WILL USE Asynchornous method call to fix.
+    checkFile() #OPTION 2 WILL NOT WORK AS LONG AS checkfile() WILL USE Asynchornous method call to fix.
     if E1 == True:
         message = "Alert E1 triggered"
         return render_template('alert.html', message=message)
@@ -178,7 +178,7 @@ def createReferenceFile():
 
 
 # Check files
-async def checkFile():
+def checkFile():
     # ADD A SECTION THAT CREATES A NEW ENCRYPTED VERSION OF THE CURRENT REFERENCE FILES.
 
     # B-0: Load file/hash pairs from reference.text and store then in a dictionary
@@ -374,5 +374,3 @@ while userSelection != 0:
     userSelection = int(input("\nWhat would you like to do? "))
 
 print("\nTerminating session...goodbye!")
-
-asyncio.run(alert())
