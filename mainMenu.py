@@ -51,10 +51,14 @@ def home():
 @app.route('/alert/', methods=['GET', "POST"])
 def alert():
 
+<<<<<<< HEAD
 #    checkFile()  # OPTION 2 WILL NOT WORK AS LONG AS checkfile() WILL USE Asynchornous method call to fix.
     if E6 == True:
         message = "Alert E0 triggered"
         return render_template('alert.html', message=message)
+=======
+    checkFile() #OPTION 2 WILL NOT WORK AS LONG AS checkfile() WILL USE Asynchornous method call to fix.
+>>>>>>> 149eabb9d80bf4c0ecc98cf5aef34cee95d20e4f
     if E1 == True:
         message = "Alert E1 triggered"
         return render_template('alert.html', message=message)
@@ -189,6 +193,7 @@ def createReferenceFile():
 
 # Check files
 def checkFile():
+<<<<<<< HEAD
 
     global E6
     global E1
@@ -196,6 +201,8 @@ def checkFile():
     global E3
     global E4
     global E5
+=======
+>>>>>>> 149eabb9d80bf4c0ecc98cf5aef34cee95d20e4f
     # ADD A SECTION THAT CREATES A NEW ENCRYPTED VERSION OF THE CURRENT REFERENCE FILES.
 
     # B-0: Load file/hash pairs from reference.text and store then in a dictionary
@@ -391,5 +398,8 @@ while userSelection != 0:
     userSelection = int(input("\nWhat would you like to do? "))
 
 print("\nTerminating session...goodbye!")
+<<<<<<< HEAD
 
 alert()
+=======
+>>>>>>> 149eabb9d80bf4c0ecc98cf5aef34cee95d20e4f
